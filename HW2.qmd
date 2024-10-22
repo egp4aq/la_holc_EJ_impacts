@@ -22,24 +22,39 @@ library(tidyverse)
 library(ggplot2)
 library(sf)
 library(tmap)
+library(patchwork)
+library(dplyr)
+library(kableExtra)
 ```
 
 ```{r}
-# Read in data
+# Read in ej screen data
 ej_df <- st_read(here('data','ejscreen','EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb'))
-holc_df <- st_read(here('data','mapping-inequality','mapping-inequality-los-angeles.json'))
+
+# Read in HOLC grade data
+holc_df <- st_read(here('data','mapping-inequality','mapping-inequality-los-angeles.json')) %>%
+  filter(st_is_valid(.))
+
+# Read in birds data
 birds_df <- st_read(here('data','gbif-birds-LA','gbif-birds-LA.shp'))
 ```
 
 ```{r}
 # Subset the ej_df to just include Los Angeles County
+# The ID filtering takes out the buffer around the ocean
 la_ej_df <- ej_df %>%
-  filter(CNTY_NAME=='Los Angeles County' & ID != "060379903000" & ID != "060379902000") # The ID filtering part takes out the buffer around the ocean
+  filter(CNTY_NAME=='Los Angeles County' & ID != "060379901000"& ID != "060379903000" & ID != "060379902000") 
+
+# Subset the ej_df to just include California, again filtering to take out the buffer
+ca_df <- ej_df %>%
+  filter(ST_ABBREV == "CA" & ID != "060379901000" & ID != "060379903000" & ID != "060379902000")
 ```
 
 ```{r}
 # Initial map of LA County EJ with HOLC grades layered on top
-tm_shape(la_ej_df, bbox = holc_df) +
+tm_shape(ca_df, bbox = holc_df) + # basemap
+  tm_polygons(col = "burlywood") +
+tm_shape(la_ej_df) +
   tm_borders() +
 tm_shape(holc_df) +
   tm_polygons('grade',
@@ -48,12 +63,14 @@ tm_shape(holc_df) +
                           'C' = '#FFEF00',
                           'D' = '#F94449'),
               title = "HOLC Grade") +
-  tm_layout(main.title = "Redlining in Los Angeles County",
-            main.title.position = "center") +
+  tm_layout(main.title = "Historical redlining in Los Angeles County",
+            main.title.position = "center",
+            bg.color = "lightblue",
+            legend.outside = TRUE) +
   tm_scale_bar(position = c("right","top"),
-               text.size = 0.5) +
+               text.size = 0.3) +
   tm_compass(position = c("left","bottom"),
-             size = 1)
+             size = 0.8)
 ```
 
 ```{r}
@@ -71,26 +88,28 @@ if(st_crs(holc_df_transform) == st_crs(la_ej_df)){
   warning("coordinate reference systems do not match")
 }
 
-# Join data frames
+# Join la_ej_df to the holc_df in order to 
 combined_df <- st_join(holc_df_transform, la_ej_df, join = st_intersects)
 ```
 
 ```{r}
 # Use combined_df to make summary table
+# The n()/nrow line gives us the % that specific grade makes up of the whole
 census_groups <- combined_df %>%
-  group_by(grade) %>%
-  summarize(census_block_pct = n()/nrow(la_ej_df)*100) %>%
+  group_by(grade) %>% # group by grade
+  summarize(census_block_pct = n()/nrow(la_ej_df)*100) %>% 
   select(grade, census_block_pct) %>%
   st_drop_geometry()
 
-print(census_groups)
+print(census_table <- kbl(census_groups))
 ```
 
 ```{r}
-# Creating a set of figures summarizing current conditions within HOLC grades
+# Create a set of figures summarizing current conditions within HOLC grades
+# I multiplied the pct_low_income by 100 to look more like a percentage
 current_conditions <- combined_df %>%
   group_by(grade) %>%
-  summarize(pct_low_income = mean(LOWINCPCT, na.rm=TRUE),
+  summarize(pct_low_income = mean(LOWINCPCT, na.rm=TRUE)*100,
             pct_part_matter = mean(PM25, na.rm=TRUE),
             pct_life_exp = mean(LIFEEXPPCT, na.rm=TRUE)) %>%
   st_drop_geometry()
@@ -99,8 +118,43 @@ print(current_conditions)
 ```
 
 ```{r}
-ggplot(current_conditions) +
-  geom_col(aes('pct_low_income', 'pct_part_matter','pct_life_exp'))
+# Trial graph of one condition in order to see what works
+#ggplot(current_conditions) +
+#  geom_col(aes(x = grade, y = pct_low_income))
+```
+
+
+```{r}
+# Use patchwork to create plots of each condition
+p1 <- ggplot(current_conditions) +
+  geom_col(aes(x = grade, y = pct_low_income), fill = "steelblue1") +
+  ggtitle("Low income (%)") +
+  labs(x = "HOLC Grade") +
+  theme_bw()
+
+p2 <- ggplot(current_conditions) +
+  geom_col(aes(x = grade, y = pct_part_matter), fill = "steelblue2") +
+  ggtitle("Particulate matter (percentile)") +
+  labs(x = "HOLC Grade") +
+  theme_bw()
+
+p3 <- ggplot(current_conditions) +
+  geom_col(aes(x = grade, y = pct_life_exp), fill = "steelblue3") +
+  ggtitle("Low Life expectancy (percentile)") +
+  labs(x = "HOLC Grade") +
+  theme_bw()
+
+# Create a plot with all three of the other plots
+p4 <- p1+p2+p3
+
+p4
+```
+
+```{r}
+ggplot(current_conditions, aes(x = 'grade')) +
+  geom_boxplot(aes(y = 'pct_low_income')) +
+  geom_boxplot(aes(y = 'pct_part_matter')) +
+  geom_boxplot(aes(y = 'pct_life_exp'))
 ```
 
 The results of this summary table tell us that as we move from grade A to D, all three of these variables steadily rises. This means that the percentage of low income folk, the percentile for PM 2.5, and the percentile for low life expectancy all increase as we go to lower grades. The percentage of low income people increases the most dramatically out of these variables.
@@ -108,6 +162,46 @@ The results of this summary table tell us that as we move from grade A to D, all
 ## Part 2: Legacy of redlining in biodiversity observations
 
 ```{r}
-
+birds_2022_df <- birds_df %>%
+  filter(year == "2022")
 ```
 
+```{r}
+# I want to left join the 2022 birds data into the HOLC data
+# Before, I will make sure that the crs of both dataframes match
+
+# Transform the CRS to be the same
+birds_2022_transform <- st_transform(birds_2022_df, crs = st_crs(holc_df_transform))
+# Build in check to make sure that the transformation worked
+if(st_crs(holc_df_transform) == st_crs(birds_2022_transform)){
+  print("it's a match!")
+} else {
+  warning("coordinate reference systems do not match")
+}
+```
+
+```{r}
+# Join 2022 birds data to the holc_df
+holc_birds_df <- st_join(holc_df_transform, birds_2022_transform, join = st_intersects)
+```
+
+```{r}
+# Group by grade and then summarize the observations
+holc_birds_group <- holc_birds_df %>%
+  group_by(grade) %>%
+  summarize(obs_percent = n()/nrow(holc_birds_df)*100) %>%
+  st_drop_geometry()
+
+print(holc_birds_group)
+```
+
+```{r}
+# Plot the percent of observation by grade
+ggplot(holc_birds_group) +
+  geom_col(aes(x = grade, y = obs_percent),
+           fill = c('lightgreen','lightblue','#FFEF00', '#F94449', 'grey')) +
+  labs(x = "HOLC Grade",
+       y = "Percent of observations")
+```
+
+Ellis-Soto et al. 2023 claims that neighborhoods that were historically redlined are the most undersampled when it comes to bird biodiversity. This plot shows more of an opposite trend. The number of observations increases from grade A-C and then decreases again when you get to grade D. Still, the highest observation precentages are grades C and D. This conclusion is the opposite of the findings from the paper. However, the number of observations is not weighed by the area of the grades, which could skew our results.
