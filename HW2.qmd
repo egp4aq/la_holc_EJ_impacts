@@ -2,7 +2,7 @@
 title: "Homework Assignment #2"
 subtitle: "Exploring patterns of environmental justice"
 author: "Liz Peterson"
-date: last-modified
+date: 10.23.24
 execute: 
   eval: true
 format:
@@ -87,6 +87,7 @@ tm_shape(holc_df) + # Add in HOLC grade data
 
 # Transform the CRS to be the same
 holc_df_transform <- st_transform(holc_df, crs = st_crs(la_ej_df))
+
 # Build in check to make sure that the transformation worked
 if(st_crs(holc_df_transform) == st_crs(la_ej_df)){
   print("it's a match!")
@@ -199,6 +200,7 @@ birds_2022_df <- birds_df %>%
 
 # Transform the CRS to be the same
 birds_2022_transform <- st_transform(birds_2022_df, crs = st_crs(holc_df_transform))
+
 # Build in check to make sure that the transformation worked
 if(st_crs(holc_df_transform) == st_crs(birds_2022_transform)){
   print("it's a match!")
