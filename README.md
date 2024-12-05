@@ -1,6 +1,6 @@
 ## The environmental impacts of redlining in LA County
 
-![LA Holc Grades Map]('imgaes/map.png')
+![LA Holc Grades Map]('images/map.png')
 
 #### Purpose
 
