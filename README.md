@@ -1,10 +1,10 @@
 ## The environmental impacts of redlining in LA County
 
-![LA Holc Grades Map]('images/map.png')
+![LA Holc Grades Map](images/map.png)
 
 ### Purpose
 
-The repository works through a data cleaning and analysis pipeline to visualize the effects of redlining in Los Angeles County.
+This repository explores the effects of historical redlining in Los Angeles County through environmental factors and biodiversity observations. This is accomplished through the combination of Home Owners' Loan Corporation (HOLC) data and the EPA's EJ screen data.
 
 ### Repository structure
 
@@ -14,18 +14,10 @@ la_holc_EJ_impacts
 ├── .gitignore 
 ├── data                        
 │   ├── ejscreen
-│   │     ├──EJSCREEN_2023_BG_Columns.xlsx
-│   │     ├──EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb
-│   │     ├──ejscreen-tech-doc-version-2-2.pdf
 │   ├── gbif-birds-LA
-│   │     ├── gbif-birds-LA.dbf
-│   │     ├──gbif-birds-LA-prj
-│   │     ├──gbif-birds-LA.shp
-│   │     ├──gbif-birds-La.shx
 │   ├── mapping-inequality
-│        ├──mapping-inequality-los-angeles.json
 │ 
-├── images/                       
+├── images                      
 │   ├── map.png
 │
 ├── la_holc_EJ_impacts.files
@@ -42,6 +34,12 @@ la_holc_EJ_impacts
 ### Data
 
 All relevant data available [here](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view?usp=drive_link).
+
+### Authors and contributors
+
+Liz Peterson
+
+Contributor: Dr. Ruth Oliver wrote this assignment for EDS 223: Geospatial Analysis & Remote Sensing
 
 ### Sources
 
