@@ -1,10 +1,10 @@
 ## The environmental impacts of redlining in LA County
 
-![LA Holc Grades Map](images/map.png)
-
 ### Purpose
 
 This repository explores the effects of historical redlining in Los Angeles County through environmental factors and biodiversity observations. This is accomplished through the combination of Home Owners' Loan Corporation (HOLC) data and the EPA's EJ screen data.
+
+![LA Holc Grades Map](images/map.png)
 
 ### Repository structure
 
