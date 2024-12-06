@@ -24,7 +24,6 @@ la_holc_EJ_impacts
 │   │     ├──gbif-birds-La.shx
 │   ├── mapping-inequality
 │        ├──mapping-inequality-los-angeles.json
-├── EDS223-HW2.Rproj
 │ 
 ├── images/                       
 │   ├── map.png
@@ -35,6 +34,7 @@ la_holc_EJ_impacts
 │
 ├── la_holc_EJ_impacts.html
 ├── la_holc_EJ_impacts.qmd
+├── la_holc_EJ_impacts.Rproj
 ├── README.md  
 │
 ```
