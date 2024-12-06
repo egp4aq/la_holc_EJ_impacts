@@ -44,10 +44,14 @@ Contributor: Dr. Ruth Oliver wrote this assignment for EDS 223: Geospatial Analy
 ### Sources
 
 U.S. Environmental Protection Agency (EPA), 2024. EJScreen Technical Documentation.
+https://www.epa.gov/system/files/documents/2024-07/ejscreen-tech-doc-version-2-3.pdf
 
 Federal Loan Agency. Federal Home Loan Bank Board. Home Owners' Loan Corporation. ( 07/01/1939 - 02/24/1942)
+https://archives.gov/research/guide-fed-records/groups/195.html
 
 Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9.
+https://pubmed.ncbi.nlm.nih.gov/37679441/
 
 Global Biodiversity Information Facility, 2024
+https://www.gbif.org/
 
